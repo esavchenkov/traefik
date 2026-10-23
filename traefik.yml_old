@@ -1,0 +1,28 @@
+# traefik.yml
+
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: true
+
+api:
+  dashboard: true
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+providers:
+  file:
+    directory: dynamic
+#    filename: "dynamic_conf.yml"
+
+log:
+  level: INFO
+
+experimental:
+  localPlugins:
+    settings:
+      moduleName: pluginmattermost
+

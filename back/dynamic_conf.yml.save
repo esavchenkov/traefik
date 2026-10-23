@@ -1,0 +1,54 @@
+# dynamic_conf.yml
+
+http:
+  routers:
+    oo-http-router:
+      rule:  "HostRegexp(`{host:mattermost-oo.+$}`)"
+      service: oo
+      entryPoints:
+        - web
+    oe-http-router:
+      rule:  "HostRegexp(`{host:mattermost-oe.+$}`)"
+      service: oe
+      entryPoints:
+        - web
+    default-http-router:
+      rule: "PathPrefix(`/`)"
+      service: oo
+      entryPoints:
+        - web
+      middlewares:
+        - pluginmattermost
+
+      tls:
+        domains:
+          - main: "*.ingress.ooma.com"
+
+  services:
+    oo:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8065"
+    oe:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8065"
+    common:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8075"
+          - url: "http://127.0.0.1:8075"
+
+  middlewares:
+    pluginmattermost:
+      plugin:
+        settings:
+          debug: true
+          headers:
+            X-Router: "mattermost"
+          mmAddon:
+            oo: "http://127.0.0.1:8066"
+            oe: "http://127.0.0.1:8066"
+
+
+

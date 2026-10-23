@@ -1,0 +1,39 @@
+# dynamic_conf.yml
+
+http:
+  routers:
+    my-http-router:
+      rule: "PathPrefix(`/`)"
+      service: my-service
+      entryPoints:
+        - web
+      middlewares:
+        - my-plugin
+
+    my-https-router:
+      rule: "Host(`mattermost-frame.ingress.ooma.com`)"
+      entryPoints:
+        - websecure
+      service: my-service
+      middlewares:
+        - my-plugin
+      tls:
+        domains:
+          - main: "*.ingress.ooma.com"
+
+  services:
+    my-service:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.25:8065"
+
+  middlewares:
+    my-plugin:
+      plugin:
+        settings:
+          headers:
+            X-Router: mattermost1
+#          kazooUrl: "http://192.168.0.161:8000"
+          mmAddonUrl: "http://127.0.0.1:8080"
+
+

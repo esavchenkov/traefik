@@ -1,0 +1,71 @@
+# dynamic_conf.yml
+
+http:
+  routers:
+    addon-router:
+      rule: "Host(`mattermost.knopkafon.ru`) && (PathPrefix(`/api/v4/accounts`) || PathPrefix(`/user_auth`))"
+      service: addon
+      entryPoints:
+        - web
+        - websecure
+      tls:
+        certResolver: letsencrypt
+    oo-http-router:
+      rule:  "HostRegexp(`{host:mattermost-oo.+$}`)"
+      service: oo
+      entryPoints:
+        - web
+    oe-http-router:
+      rule:  "HostRegexp(`{host:mattermost-oe.+$}`)"
+      service: oe
+      entryPoints:
+        - web
+    default-https-router:
+      rule: "Host(`mattermost.knopkafon.ru`)"
+      service: oo
+      entryPoints:
+        - websecure
+      middlewares:
+        - pluginmattermost
+      tls:
+        certResolver: letsencrypt
+#        domains:
+#          - main: "*.ingress.ooma.com"
+
+  services:
+    oo:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8065"
+    oe:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8065"
+    addon:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8066"
+    common:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8075"
+          - url: "http://127.0.0.1:8075"
+
+  middlewares:
+    pluginmattermost:
+      plugin:
+        settings:
+          debug: true
+          headers:
+            X-Router: "mattermost"
+          mmAddon:
+            oo: "http://127.0.0.1:8066"
+            oe: "http://127.0.0.1:8066"
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: "/etc/letsencrypt/live/knopkafon.ru/fullchain.pem"
+        keyFile: "/etc/letsencrypt/live/knopkafon.ru/privkey.pem"
+#        domains:
+#          - main: "mattermost.knopkafon.ru"

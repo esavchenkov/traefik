@@ -1,0 +1,10 @@
+tls:
+  certificates:
+    -
+      certFile: /etc/certs/ooma/tls.crt
+      keyFile: /etc/certs/ooma/tls.key
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/certs/ooma/tls.crt
+        keyFile: /etc/certs/ooma/tls.key
